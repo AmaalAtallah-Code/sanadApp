@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سَنَد - الخريطة المحلية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo-section">
+            <h2>خريطة الخدمات المحلية</h2>
+        </div>
+        <div class="status-badge offline">
+            <span class="status-text">تصفح بدون إنترنت</span>
+        </div>
+    </header>
+
+    <main class="map-wrapper" style="padding: 10px; position: relative; overflow: hidden;">
+        <p style="font-size: 13px; color: #666; margin-bottom: 10px; text-align: center;">
+            📍 دبابيس تفاعلية توضح نقاط الموارد القريبة منك (محدثة محلياً)
+        </p>
+
+        <div class="map-container" style="position: relative; width: 100%; max-width: 500px; margin: 0 auto; border: 2px solid #0d5c63; border-radius: 12px; overflow: hidden;">
+            
+            <img src="assets/gaza-map.png" alt="خريطة المنطقة المحلية" id="local-map-img" style="width: 100%; display: block; min-height: 400px; background-color: #eef2f3;" onerror="this.style.display='none'; document.getElementById('map-placeholder').style.display='flex';">
+            
+            <div id="map-placeholder" style="display: none; width: 100%; height: 400px; background: #eef2f3; align-items: center; justify-content: center; flex-direction: column; color: #aaa;">
+                <span style="font-size: 48px;">🗺️</span>
+                <p style="font-size: 12px; margin-top: 10px;">بانتظار صورة الخريطة من الملتيميديا (gaza-map.png)</p>
+            </div>
+
+            <div class="map-pin water-pin" onclick="showPinDetails('محطة مياه النصر', '💧 مياه شرب - متاح حالياً', 'حي النصر - بجوار المدرسة')" style="position: absolute; top: 35%; left: 45%; cursor: pointer; font-size: 24px; transform: translate(-50%, -100%); transition: transform 0.2s;">
+                📍
+            </div>
+
+            <div class="map-pin power-pin" onclick="showPinDetails('نفتة الأمل للشحن', '⚡ شحن هواتف - متاح حالياً', 'الرمال - شارع الشهداء')" style="position: absolute; top: 60%; left: 30%; cursor: pointer; font-size: 24px; transform: translate(-50%, -100%);">
+                📍
+            </div>
+
+            <div class="map-pin maintenance-pin" onclick="showPinDetails('مركز صيانة الهندسة', '🛠️ إصلاح أجهزة - مزدحم جداً', 'شمال غزة - قرب الدوار')" style="position: absolute; top: 20%; left: 65%; cursor: pointer; font-size: 24px; transform: translate(-50%, -100%);">
+                📍
+            </div>
+        </div>
+
+        <div id="info-box" style="display: none; background: white; border: 1px solid #0d5c63; border-radius: 8px; padding: 15px; margin-top: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+            <h4 id="info-title" style="color: #0d5c63; margin-bottom: 5px;">اسم النقطة</h4>
+            <p id="info-status" style="font-weight: bold; font-size: 13px; color: #e65f2b; margin-bottom: 5px;">الحالة</p>
+            <p id="info-loc" style="font-size: 12px; color: #666;">العنوان بالتفصيل</p>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">🏠 الرئيسية</a>
+        <a href="map.html" class="nav-item active">📍 الخريطة</a>
+        <a href="report.html" class="nav-item">⚠️ إبلاغ</a>
+        <a href="admin.html" class="nav-item">📊 الإدارة</a>
+    </nav>
+
+    <script>
+        // دالة إظهار تفاصيل النقطة أسفل الخريطة عند النقر على الدبوس
+        function showPinDetails(name, status, location) {
+            document.getElementById('info-box').style.display = 'block';
+            document.getElementById('info-title').innerText = name;
+            document.getElementById('info-status').innerText = status;
+            document.getElementById('info-loc').innerText = location;
+            
+            // تأثير بصري خفيف لتكبير الدبوس المختار (تحدي تفاعلي فرونت اند)
+            const pins = document.querySelectorAll('.map-pin');
+            pins.forEach(pin => pin.style.transform = 'translate(-50%, -100%) scale(1)');
+            event.currentTarget.style.transform = 'translate(-50%, -100%) scale(1.3)';
+        }
+    </script>
+</body>
+</html>

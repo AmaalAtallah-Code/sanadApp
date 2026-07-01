@@ -1,0 +1,721 @@
+/* إعدادات الخطوط والتصفير الأساسية */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f7f9fa;
+    color: #333;
+    padding-bottom: 80px; /* لعدم تغطية المحتوى بشريط التنقل السفلي */
+}
+
+/* شريط الحالة العلوي */
+.app-header {
+    background-color: #0d5c63; /* لون تركواز داكن احترافي */
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.status-badge {
+    background-color: #e65f2b; /* برتقالي للتنبيه بالـ Offline */
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* صندوق البحث */
+.search-section {
+    padding: 15px;
+}
+
+#search-bar {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background-color: #fff;
+}
+
+/* شبكة التصنيفات */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 0 15px 15px 15px;
+}
+
+.category-card {
+    background-color: #fff;
+    border: 1px solid #eef2f3;
+    border-radius: 10px;
+    padding: 12px 5px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.category-card.active {
+    border: 2px solid #0d5c63;
+    background-color: #f0f7f7;
+}
+
+.category-card .icon-box {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.category-card h3 {
+    font-size: 11px;
+    color: #555;
+}
+
+/* قائمة الخدمات والبطاقات */
+.services-list-section {
+    padding: 15px;
+}
+
+.section-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #0d5c63;
+}
+
+.service-card {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #eaeaea;
+    overflow: hidden;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.card-image-placeholder {
+    background-color: #eef2f5;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-icon {
+    font-size: 40px;
+}
+
+.card-details {
+    padding: 15px;
+}
+
+.service-name {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #222;
+}
+
+.badges-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-available {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.type-badge {
+    background-color: #e2f0d9;
+    color: #385723;
+}
+
+.service-location {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+/* الأزرار */
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #0d5c63;
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: #fff;
+    color: #e65f2b;
+    border: 1px solid #e65f2b;
+}
+
+/* شريط التنقل السفلي الثابت */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #777;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nav-item.active {
+    color: #0d5c63;
+    font-weight: bold;
+}
+/* الألوان الإضافية لحالة الموارد */
+.status-busy {
+    background-color: #fff3cd;
+    color: #856404; /* أصفر داكن للمزدحم */
+}
+
+.status-unavailable {
+    background-color: #f8d7da;
+    color: #721c24; /* أحمر للمقطوع */
+}
+/* تنسيقات شاشات الترحيب والتعريف */
+.full-overlay-figma {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #061527; /* اللون الداكن الفخم من الفيجما */
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    direction: rtl;
+    font-family: inherit;
+}
+
+.splash-content {
+    text-align: center;
+    animation: fadeInOut 2s ease-in-out forwards;
+}
+
+.logo-placeholder-figma {
+    font-size: 70px;
+    margin-bottom: 15px;
+}
+
+.brand-name-figma {
+    color: #ffffff;
+    font-size: 32px;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+/* بطاقة التعريف */
+.onboarding-card {
+    background: #ffffff;
+    width: 90%;
+    max-width: 400px;
+    height: 85vh;
+    border-radius: 32px;
+    padding: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.skip-link {
+    position: absolute;
+    top: 25px; right: 25px;
+    color: #94a3b8;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.onboarding-step {
+    text-align: center;
+    animation: slideIn 0.4s ease-out;
+}
+
+.step-icon-box {
+    font-size: 60px;
+    background: #f1f5f9;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 30px auto;
+}
+
+.onboarding-step h3 {
+    font-size: 22px;
+    color: #061527;
+    margin: 0 0 15px 0;
+}
+
+.onboarding-step p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    padding: 0 10px;
+}
+
+/* مؤشرات النقاط لصفحات الفيجما */
+.indicators {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 40px;
+}
+.indicators .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transition: all 0.3s;
+}
+.indicators .dot.active {
+    width: 24px; background: #061527; border-radius: 4px;
+}
+
+/* الأزرار الداكنة متل الفيجما */
+.btn-next-figma {
+    width: 100%;
+    background: #061527;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: scale(0.95); }
+    20% { opacity: 1; transform: scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+/* --- تصميم شاشات الترحيب التكميلية --- */
+.full-overlay-figma {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #061527; /* اللون الداكن الفخم من تصميم الفيجما */
+    z-index: 9999; /* لجعل الشاشة تظهر فوق كل شيء مؤقتاً */
+    display: flex; align-items: center; justify-content: center;
+    direction: rtl;
+}
+
+.splash-content {
+    text-align: center;
+    animation: fadeOutSplash 2s ease-in-out forwards;
+}
+
+.brand-name-figma {
+    color: #ffffff;
+    font-size: 42px;
+    margin: 0;
+}
+
+.onboarding-card {
+    background: #ffffff;
+    width: 90%; max-width: 380px; height: 80vh;
+    border-radius: 32px; padding: 30px;
+    position: relative; display: flex; flex-direction: column; justify-content: center;
+}
+
+.skip-link {
+    position: absolute; top: 25px; right: 25px;
+    color: #94a3b8; font-size: 14px; cursor: pointer;
+}
+
+.onboarding-step { text-align: center; }
+
+.step-icon-box {
+    font-size: 50px; background: #f1f5f9;
+    width: 110px; height: 110px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 25px auto;
+}
+
+.onboarding-step h3 { font-size: 20px; color: #061527; margin: 0 0 12px 0; }
+.onboarding-step p { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 35px; }
+
+.indicators { display: flex; justify-content: center; gap: 8px; margin-bottom: 35px; }
+.indicators .dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
+.indicators .dot.active { width: 22px; background: #061527; border-radius: 4px; }
+
+.btn-next-figma {
+    width: 100%; background: #061527; color: white; border: none;
+    padding: 15px; border-radius: 14px; font-size: 15px; font-weight: bold; cursor: pointer;
+}
+
+@keyframes fadeOutSplash {
+    0%, 80% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+/* --- تنسيقات شاشات الحسابات الجديدة --- */
+.user-type-option {
+    display: block;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+}
+
+.user-type-option input[type="radio"] {
+    display: none;
+}
+
+.option-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: right;
+}
+
+.option-icon {
+    font-size: 22px;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.option-text h4 {
+    margin: 0 0 4px 0;
+    color: #061527;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.option-text p {
+    margin: 0;
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+/* التفاعل عند اختيار نوع الحساب */
+.user-type-option:has(input[type="radio"]:checked) {
+    border-color: #061527;
+    background: #f8fafc;
+    box-shadow: 0 4px 12px rgba(6, 21, 39, 0.05);
+}
+
+.input-group-figma {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+}
+
+.input-group-figma label {
+    font-size: 12px;
+    color: #475569;
+    font-weight: bold;
+}
+
+.input-group-figma input {
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 13px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.input-group-figma input:focus {
+    border-color: #061527;
+}
+
+.back-arrow {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #061527;
+}
+/* --- واجهات التطبيق الأساسية وشريط التنقل --- */
+.app-view {
+    animation: fadeInView 0.3s ease-in-out;
+    padding: 20px;
+    direction: rtl;
+}
+
+@keyframes fadeInView {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.main-header-figma {
+    background: #061527;
+    color: white;
+    padding: 30px 20px;
+    border-radius: 0 0 24px 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: -20px -20px 20px -20px;
+}
+
+.user-avatar-badge {
+    width: 55px;
+    height: 55px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.header-text-box h3 {
+    margin: 4px 0 0 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header-text-box p {
+    margin: 0;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.search-bar-trigger {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.search-bar-trigger input, .search-header-box input {
+    width: 100%;
+    padding: 14px 45px 14px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    outline: none;
+    font-size: 14px;
+}
+
+.search-icon-inside {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #94a3b8;
+}
+
+.section-title-figma {
+    font-size: 16px;
+    font-weight: bold;
+    color: #061527;
+    margin-bottom: 15px;
+}
+
+.services-grid-figma {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.service-card-item {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: transform 0.2s;
+}
+
+.service-card-item:hover {
+    transform: scale(1.02);
+}
+
+.service-icon-wrap {
+    font-size: 28px;
+    background: #f8fafc;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 10px auto;
+}
+
+.service-card-item span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #334155;
+}
+
+/* بطاقة الطوارئ */
+.emergency-banner-figma {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.banner-icon {
+    font-size: 24px;
+    color: #ef4444;
+}
+
+.banner-info h5 {
+    margin: 0 0 4px 0;
+    color: #991b1b;
+    font-weight: bold;
+}
+
+.banner-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #b91c1c;
+}
+
+/* البار السفلي الثابت */
+.bottom-nav-bar-figma {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+}
+
+.nav-tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.nav-tab-item.active {
+    color: #061527;
+}
+
+.nav-icon {
+    font-size: 20px;
+}
+
+.nav-text {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+/* فلاتر وقائمة البحث */
+.filter-tabs-container {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.filter-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.filter-tab.active {
+    background: #061527;
+    color: white;
+    border-color: #061527;
+}
+
+.results-vertical-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.result-card-figma {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.result-main-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.badge-status-open {
+    background: #f0fdf4;
+    color: #16a34a;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: bold;
+}

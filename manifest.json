@@ -1,0 +1,16 @@
+{
+  "short_name": "سند",
+  "name": "سند - دليل الخدمات المحلي بدون إنترنت",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#f7f9fa",
+  "theme_color": "#0d5c63",
+  "display": "standalone",
+  "orientation": "portrait"
+}

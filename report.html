@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سَنَد - إبلاغ عن حالة خدمة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo-section">
+            <h2>إرسال تحديث محلي</h2>
+        </div>
+        <a href="index.html" style="color: white; text-decoration: none; font-size: 14px;">⬅️ عودة</a>
+    </header>
+
+    <main class="report-container" style="padding: 20px;">
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6;">
+            ساهم في مساعدة غيرك! إذا قمت بزيارة نقطة خدمة وتبين لك أن حالتها تغيرت، يرجى تحديث البيانات أدناه. سيتم حفظ البلاغ في هاتفك فوراً.
+        </p>
+
+        <form id="report-form">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">اختر نقطة الخدمة:</label>
+                <select id="service-select" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; background: white;">
+                    <option value="">-- اختر النقطة من القائمة --</option>
+                    <option value="1">محطة مياه النصر</option>
+                    <option value="2">نقطة الأمل للطاقة الشمسية</option>
+                    <option value="3">مركز صيانة الهندسة السريعة</option>
+                    <option value="4">تكيّة وبئر الشيخ رضوان</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">الحالة الحالية للنقطة:</label>
+                <select id="status-select" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; background: white;">
+                    <option value="available">متاح حالياً وعامل</option>
+                    <option value="busy">مزدحم جداً (انتظار طويل)</option>
+                    <option value="unavailable">غير متاح / متوقف حالياً</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">ملاحظات إضافية (ساعات العمل، كمية المخزون المتبقية):</label>
+                <textarea id="notes-input" rows="4" placeholder="مثال: مياه الحلوة متوفرة لكن الطابور طويل، أو الخزان ممتلئ للمنتصف..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-family: inherit;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px;">حفظ التحديث في الهاتف</button>
+        </form>
+
+        <section class="local-reports-section" style="margin-top: 30px;">
+            <h3 style="font-size: 16px; color: #0d5c63; margin-bottom: 10px;">📋 بلاغاتك المحفوظة قيد الانتظار:</h3>
+            <div id="local-reports-list">
+                </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">🏠 الرئيسية</a>
+        <a href="#" class="nav-item">📍 الخريطة</a>
+        <a href="report.html" class="nav-item active">⚠️ إبلاغ</a>
+        <a href="#" class="nav-item">📊 الإدارة</a>
+    </nav>
+
+    <script src="report.js"></script>
+</body>
+</html>
