@@ -10,7 +10,7 @@
 <body>
     <div id="splash-screen" class="full-overlay-figma">
     <div class="splash-content">
-        <h1 class="brand-name-figma"></h1>سند</h1>
+        <h1 class="brand-name-figma">سند</h1>
     </div>
 </div>
 
@@ -55,50 +55,7 @@
         </div>
     </div>
 </div>
-    
-</div>
 
-<div id="onboarding-screen" class="full-overlay-figma" style="display: none;">
-    <div class="onboarding-card">
-        <div class="skip-link" onclick="endOnboarding()">تخطي</div>
-        
-        <div class="onboarding-step" id="step-1">
-            <div class="step-icon-box">🍃📍</div>
-            <h3>مرحباً بك في سند</h3>
-            <p>اكتشف أماكن جديدة من حولك، دليلك الشخصي للمدينة في جيبك.</p>
-            <div class="indicators">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-            <button class="btn-next-figma" onclick="nextStep(2)">التالي ➡️</button>
-        </div>
-
-        <div class="onboarding-step" id="step-2" style="display: none;">
-            <div class="step-icon-box">🔍💧</div>
-            <h3>ابحث عن الخدمات بسهولة</h3>
-            <p>كل ما تحتاجه من خدمات في مكان واحد، موثوقة ومحدثة لخدمة مجتمعنا.</p>
-            <div class="indicators">
-                <span class="dot"></span>
-                <span class="dot active"></span>
-                <span class="dot"></span>
-            </div>
-            <button class="btn-next-figma" onclick="nextStep(3)">التالي ➡️</button>
-        </div>
-
-        <div class="onboarding-step" id="step-3" style="display: none;">
-            <div class="step-icon-box">🤝📊</div>
-            <h3>مجتمع يدعم بعضه</h3>
-            <p>شاركنا حالة الخدمات وساعد غيرك في العثور على ما يحتاجون إليه بأمان.</p>
-            <div class="indicators">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot active"></span>
-            </div>
-            <button class="btn-next-figma" onclick="endOnboarding()">أبدأ الآن ✨</button>
-        </div>
-    </div>
-</div>
 <div id="auth-choice-screen" class="full-overlay-figma" style="display: none;">
     <div class="onboarding-card" style="height: auto; padding: 35px 25px;">
         <h3 style="text-align: center; margin-bottom: 10px; color: #061527; font-weight: bold; font-size: 22px;">أهلاً بك في سند</h3>
@@ -183,94 +140,6 @@
             <div style="margin-top: 15px; display: flex; align-items: center; gap: 8px; justify-content: flex-start; direction: rtl;">
                 <input type="checkbox" id="terms" required>
                 <label for="terms" style="font-size: 11px; color: #475569;">أوافق على الشروط والأحكام وسياسة الخصوصية</label>
-            </div>
-            <button type="submit" class="btn-next-figma" style="margin-top: 25px;">إنشاء حساب</button>
-        </form>
-        <p style="text-align: center; font-size: 13px; margin-top: 20px; color: #64748b;">
-            لديك حساب بالفعل؟ <span style="color: #061527; font-weight: bold; cursor: pointer;" onclick="backToLogin()">تسجيل الدخول</span>
-        </p>
-    </div>
-</div>
-<div id="auth-choice-screen" class="full-overlay-figma" style="display: none;">
-    <div class="onboarding-card" style="height: auto; padding: 35px 25px;">
-        <h3 style="text-align: center; margin-bottom: 10px; color: #061527; font-weight: bold;">أهلاً بك في سند</h3>
-        <p style="text-align: center; font-size: 13px; color: #64748b; margin-bottom: 30px;">الرجاء اختيار نوع الحساب للمتابعة</p>
-        
-        <label class="user-type-option">
-            <input type="radio" name="user_type" value="citizen" checked>
-            <div class="option-content">
-                <span class="option-icon">🔍</span>
-                <div class="option-text">
-                    <h4>أبحث عن خدمة</h4>
-                    <p>أريد تصفح الخدمات والعثور على محطات قريبة من حولي.</p>
-                </div>
-            </div>
-        </label>
-
-        <label class="user-type-option" style="margin-top: 15px;">
-            <input type="radio" name="user_type" value="provider">
-            <div class="option-content">
-                <span class="option-icon">💼</span>
-                <div class="option-text">
-                    <h4>مزود خدمة</h4>
-                    <p>أريد تقديم خدماتي والوصول إلى المحتاجين وإدارة محطتي.</p>
-                </div>
-            </div>
-        </label>
-
-        <button class="btn-next-figma" style="margin-top: 35px;" onclick="handleUserTypeChoice()">متابعة</button>
-        <p style="text-align: center; font-size: 13px; margin-top: 20px; color: #64748b;">
-            لديك حساب بالفعل؟ <span style="color: #061527; font-weight: bold; cursor: pointer;" onclick="goToLogin()">تسجيل الدخول</span>
-        </p>
-    </div>
-</div>
-
-<div id="login-screen" class="full-overlay-figma" style="display: none;">
-    <div class="onboarding-card" style="height: auto; padding: 35px 25px;">
-        <div class="back-arrow" onclick="backToChoice()">➡️</div>
-        <div class="step-icon-box" style="width: 80px; height: 80px; font-size: 35px; margin-bottom: 15px;">🔒</div>
-        <h3 style="text-align: center; color: #061527; font-weight: bold; margin-bottom: 5px;">مرحباً بعودتك</h3>
-        <p style="text-align: center; font-size: 12px; color: #64748b; margin-bottom: 25px;">سجل دخولك للمتابعة في سند</p>
-        
-        <form onsubmit="event.preventDefault(); handleLoginSubmit();">
-            <div class="input-group-figma">
-                <label>البريد الإلكتروني</label>
-                <input type="email" placeholder="أدخل بريدك الإلكتروني" required id="login-email">
-            </div>
-            <div class="input-group-figma" style="margin-top: 15px;">
-                <label>كلمة المرور</label>
-                <input type="password" placeholder="أدخل كلمة المرور" required id="login-pass">
-            </div>
-            <button type="submit" class="btn-next-figma" style="margin-top: 25px;">تسجيل الدخول</button>
-        </form>
-        <p style="text-align: center; font-size: 13px; margin-top: 20px; color: #64748b;">
-            ليس لديك حساب؟ <span style="color: #061527; font-weight: bold; cursor: pointer;" onclick="goToRegister()">إنشاء حساب</span>
-        </p>
-    </div>
-</div>
-
-<div id="register-screen" class="full-overlay-figma" style="display: none;">
-    <div class="onboarding-card" style="height: auto; padding: 35px 25px;">
-        <div class="back-arrow" onclick="backToLogin()">➡️</div>
-        <h3 style="text-align: center; color: #061527; font-weight: bold; margin-bottom: 5px;">إنشاء حساب جديد</h3>
-        <p style="text-align: center; font-size: 12px; color: #64748b; margin-bottom: 25px;">انضم إلى مجتمع سند الآن واستفد من خدماتنا</p>
-        
-        <form onsubmit="event.preventDefault(); handleRegisterSubmit();">
-            <div class="input-group-figma">
-                <label>الاسم الكامل</label>
-                <input type="text" placeholder="أدخل اسمك الكامل" required>
-            </div>
-            <div class="input-group-figma" style="margin-top: 12px;">
-                <label>البريد الإلكتروني</label>
-                <input type="email" placeholder="example@domain.com" required>
-            </div>
-            <div class="input-group-figma" style="margin-top: 12px;">
-                <label>كلمة المرور</label>
-                <input type="password" placeholder="********" required>
-            </div>
-            <div class="input-group-figma" style="margin-top: 12px;">
-                <label>تأكيد كلمة المرور</label>
-                <input type="password" placeholder="********" required>
             </div>
             <button type="submit" class="btn-next-figma" style="margin-top: 25px;">إنشاء حساب</button>
         </form>
