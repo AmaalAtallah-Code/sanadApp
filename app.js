@@ -1,297 +1,323 @@
-// تسجيل الـ Service Worker لتمكين العمل بدون إنترنت (PWA)
-// تسجيل الـ Service Worker بطريقة محمية لمنع توقف التطبيق
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker Registered Successfully'))
-        .catch(err => console.log('Service Worker missing, moving forward safely...', err));
+// ==================== قاعدة بيانات افتراضية (يتم استبدالها إذا وُجد data.js) ====================
+if (typeof SANAD_OFFLINE_DATABASE === 'undefined') {
+    window.SANAD_OFFLINE_DATABASE = {
+        water: [
+            { id: 1, region: "النصر", location: "محطة مياه النصر", type: "مياه شرب محلاة", available: 3000, capacity: 5000, status: "متاح", phone: "0599000001", hours: "08:00 ص - 04:00 م" },
+            { id: 2, region: "الشيخ رضوان", location: "نقطة مياه الشيخ رضوان", type: "مياه شرب محلاة", available: 1200, capacity: 4000, status: "منخفض", phone: "0599000002", hours: "09:00 ص - 03:00 م" }
+        ],
+        power: [
+            { id: 1, region: "الرمال", location: "نقطة شحن الرمال", available_ports: 3, total_ports: 10, status: "متاح", phone: "0599000003", hours: "24 ساعة" }
+        ],
+        maintenance: [
+            { id: 1, region: "التفاح", location: "مركز صيانة التفاح", type: "أجهزة كهربائية وهواتف", technicians: 2, status: "متاح", phone: "0599000004", hours: "10:00 ص - 06:00 م" }
+        ],
+        aid: [
+            { id: 1, region: "الزيتون", location: "نقطة توزيع الزيتون", type: "طرود غذائية", distributor: "الهلال الأحمر", remaining_qty: 40, total_qty: 100, status: "متاح", phone: "0599000005", hours: "09:00 ص - 01:00 م" }
+        ]
+    };
 }
 
+// تحويل اسم الفئة "repair" (المستخدم بالواجهة) إلى "maintenance" (المستخدم بقاعدة البيانات)
+function normalizeCategory(cat) {
+    return cat === 'repair' ? 'maintenance' : cat;
+}
 
-// البيانات الحقيقية المدمجة من ملفات CSV الأربعة وتصميم الفيجما
-const servicesData = [
-    // 1. ملف المصنف (المياه)
-    {
-        id: 1,
-        name: "محطة مياه النصر",
-        category: "water",
-        type: "مياه شرب محلاة",
-        status: "available",
-        statusText: "متاح حالياً",
-        region: "حي النصر، المنطقة الشرقية",
-        landmark: "بجوار مدرسة النصر الإعدادية",
-        workingHours: "08:00 ص - 04:00 م",
-        icon: "💧"
-    },
-    // 2. ملف المصنف (شحن الهواتف)
-    {
-        id: 2,
-        name: "نقطة الأمل للطاقة الشمسية",
-        category: "power",
-        type: "شحن هواتف وأجهزة",
-        status: "available",
-        statusText: "متاح حالياً",
-        region: "الرمال، شارع الشهداء",
-        landmark: "مقابل مخبز اليازجي",
-        workingHours: "07:30 ص - 05:00 م",
-        icon: "⚡"
-    },
-    // 3. ملف المصنف (مراكز الصيانة)
-    {
-        id: 3,
-        name: "مركز صيانة الهندسة السريعة",
-        category: "maintenance",
-        type: "إصلاح هواتف وشاشات",
-        status: "busy",
-        statusText: "مزدحم جداً",
-        region: "شمال غزة، جباليا النزلة",
-        landmark: "قرب الدوار الرئيسي",
-        workingHours: "09:00 ص - 03:00 م",
-        icon: "🛠️"
-    },
-    // 4. ملف المصنف (المساعدات)
-    {
-        id: 4,
-        name: "تكية الشيخ رضوان الخيرية",
-        category: "aid",
-        type: "وجبات ومساعدات عينية",
-        status: "unavailable",
-        statusText: "غير متاح حالياً",
-        region: "حي الشيخ رضوان",
-        landmark: "قرب سوق الخضار المركزي",
-        workingHours: "11:00 ص - 02:00 م",
-        icon: "📦"
-    }
-];
-// التحكم في شاشات الترحيب والتعريف
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. تشغيل شاشة التحميل (Splash) لمدة ثانيتين ثم إظهار التعريفية
+let activeSearchCategory = 'all';
+let pendingAccountType = 'citizen';
+let currentlyOpenService = null;
+
+// ==================== 1. شاشة البداية والتنقل التمهيدي ====================
+window.addEventListener('DOMContentLoaded', () => {
+    updateNetworkStatus();
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+
     setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) splash.style.display = 'none';
-        
-        // التحقق إذا كان المستخدم يفتح التطبيق لأول مرة
-        if (!localStorage.getItem('sanad_visited')) {
-            document.getElementById('onboarding-screen').style.display = 'flex';
-        }
-    }, 2000);
+        hideOverlay('splash-screen');
+        showOverlay('onboarding-screen');
+    }, 1200);
 });
 
-// الانتقال بين خطوات التعريف
-function nextStep(stepNumber) {
-    // إخفاء جميع الخطوات
-    document.querySelectorAll('.onboarding-step').forEach(step => step.style.display = 'none');
-    // إظهار الخطوة المطلوبة
-    document.getElementById(`step-2`).style.display = stepNumber === 2 ? 'block' : 'none';
-    document.getElementById(`step-3`).style.display = stepNumber === 3 ? 'block' : 'none';
-}
-
-// إنهاء العرض الترحيبي والدخول للتطبيق بشكل دائم
-function endOnboarding() {
-    document.getElementById('onboarding-screen').style.display = 'none';
-    localStorage.setItem('sanad_visited', 'true'); // حفظ الزيارة حتى لا تظهر له مرة أخرى
-}
-// تشغيل شاشة التحميل والترحيب عند فتح التطبيق
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) splash.style.display = 'none';
-        
-        // إذا كانت هذه المرة الأولى للمستخدم، تظهر له الشاشات التعريفية
-        if (!localStorage.getItem('sanad_visited')) {
-            document.getElementById('onboarding-screen').style.display = 'flex';
-        }
-    }, 2000); // تختفي شاشة التحميل تلقائياً بعد ثانيتين
-});
-
-// التنقل بين شاشات التعريف الثلاث بالترتيب
-function nextStep(stepNumber) {
-    // إخفاء كل الخطوات أولاً
-    document.getElementById('step-1').style.display = 'none';
-    document.getElementById('step-2').style.display = 'none';
-    document.getElementById('step-3').style.display = 'none';
-    
-    // إظهار الخطوة القادمة
-    document.getElementById(`step-${stepNumber}`).style.display = 'block';
-}
-
-// تعديل دالة إنهاء التعريف لفتح شاشة اختيار نوع الحساب بدلاً من الدخول المباشر
-function endOnboarding() {
-    document.getElementById('onboarding-screen').style.display = 'none';
-    document.getElementById('auth-choice-screen').style.display = 'flex';
-}
-
-// معالجة اختيار نوع المستخدم عند الضغط على زر "متابعة"
-function handleUserTypeChoice() {
-    const selectedType = document.querySelector('input[name="user_type"]:checked').value;
-    
-    if (selectedType === 'citizen') {
-        // إذا كان مواطن عادي، نغلق طبقات الحسابات ليدخل لواجهتك الأساسية القديمة مباشرة
-        document.getElementById('auth-choice-screen').style.display = 'none';
+function updateNetworkStatus() {
+    const badge = document.getElementById('network-status');
+    if (!badge) return;
+    const textEl = badge.querySelector('.status-text');
+    const iconEl = badge.querySelector('.status-icon');
+    if (navigator.onLine) {
+        badge.classList.remove('offline');
+        badge.classList.add('online');
+        if (textEl) textEl.innerText = 'متصل بالإنترنت';
+        if (iconEl) iconEl.innerText = '📶';
     } else {
-        // إذا كان مزود خدمة، نفتح له شاشة تسجيل الدخول الخاصة بالمحطات
-        document.getElementById('auth-choice-screen').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'flex';
+        badge.classList.remove('online');
+        badge.classList.add('offline');
+        if (textEl) textEl.innerText = 'وضع العمل بدون إنترنت';
+        if (iconEl) iconEl.innerText = '📶❌';
     }
 }
 
-// دالات التنقل السريع والعودة للخلف المتطابقة مع أزرار واجهات الفيجما
+function hideOverlay(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+}
+function showOverlay(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'flex';
+}
+
+// ==================== 2. التبويبات التمهيدية (Onboarding) ====================
+function nextStep(stepNumber) {
+    document.querySelectorAll('.onboarding-step').forEach(step => step.style.display = 'none');
+    document.querySelectorAll('.onboarding-screen .dot, .indicators .dot').forEach(dot => dot.classList.remove('active'));
+
+    const targetStep = document.getElementById(`step-${stepNumber}`);
+    if (targetStep) {
+        targetStep.style.display = 'block';
+        const dots = targetStep.querySelectorAll('.dot');
+        if (dots[stepNumber - 1]) dots[stepNumber - 1].classList.add('active');
+        else {
+            const allDots = targetStep.parentElement.querySelectorAll('.dot');
+            if (allDots[stepNumber - 1]) allDots[stepNumber - 1].classList.add('active');
+        }
+    }
+}
+
+function endOnboarding() {
+    hideOverlay('onboarding-screen');
+    showOverlay('auth-choice-screen');
+}
+
+// ==================== 3. اختيار نوع الحساب / تسجيل الدخول / إنشاء حساب ====================
+function handleUserTypeChoice() {
+    const selected = document.querySelector('input[name="user_type"]:checked');
+    pendingAccountType = selected ? selected.value : 'citizen';
+    hideOverlay('auth-choice-screen');
+    showOverlay('register-screen');
+}
+
 function goToLogin() {
-    document.getElementById('auth-choice-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
+    hideOverlay('auth-choice-screen');
+    showOverlay('login-screen');
 }
 
-// العودة من شاشة تسجيل الدخول إلى شاشة الاختيار الرئيسية
 function backToChoice() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('auth-choice-screen').style.display = 'flex';
+    hideOverlay('login-screen');
+    showOverlay('auth-choice-screen');
 }
 
-// الانتقال من تسجيل الدخول إلى إنشاء حساب جديد
 function goToRegister() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('register-screen').style.display = 'flex';
+    hideOverlay('login-screen');
+    showOverlay('register-screen');
 }
 
-// العودة من شاشة إنشاء الحساب إلى شاشة تسجيل الدخول
 function backToLogin() {
-    document.getElementById('register-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
+    hideOverlay('register-screen');
+    showOverlay('login-screen');
 }
 
-// 1. تحديث دالة تسجيل الدخول الناجح لمزود الخدمة لفتح التطبيق الأساسي
 function handleLoginSubmit() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app-container').style.display = 'block'; 
+    const email = document.getElementById('login-email')?.value.trim();
+    const pass = document.getElementById('login-pass')?.value.trim();
+    if (!email || !pass) {
+        alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور.');
+        return;
+    }
+    hideOverlay('login-screen');
+    enterMainApp();
+}
+
+function handleRegisterSubmit() {
+    hideOverlay('register-screen');
+    enterMainApp();
+}
+
+// ==================== 4. الدخول إلى التطبيق الرئيسي ====================
+function enterMainApp() {
+    const searchSection = document.querySelector('.search-section');
+    const categoriesGrid = document.querySelector('.categories-grid');
+    if (searchSection) searchSection.style.display = 'none';
+    if (categoriesGrid) categoriesGrid.style.display = 'none';
+
+    const mainApp = document.getElementById('main-app-container');
+    if (mainApp) mainApp.style.display = 'block';
+
     switchView('home');
 }
 
-// 2. عند إتمام إنشاء حساب جديد والضغط على الزر
-function handleRegisterSubmit() {
-    alert('تم إنشاء حساب مزود الخدمة بنجاح! يمكنك الآن تسجيل الدخول.');
-    backToLogin();
-}
-
-// 3. آلية التبديل الذكي بين الواجهات الخمسة الأساسية وتحديث الأزرار النشطة (Tabs)
+// ==================== 5. التنقل بين شاشات التطبيق الرئيسي ====================
 function switchView(viewName) {
-    // إخفاء جميع الواجهات المضافة حديثاً أولاً
-    document.querySelectorAll('.app-view').forEach(view => {
-        view.style.display = 'none';
-    });
-    
-    // إظهار الواجهة المطلوبة فقط
-    document.getElementById(`view-${viewName}`).style.display = 'block';
-    
-    // تحديث حالة الأزرار النشطة في شريط التنقل السفلي ليطابق الفيجما
-    document.querySelectorAll('.nav-tab-item').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    const activeTab = document.getElementById(`tab-${viewName}`);
-    if (activeTab) activeTab.classList.add('active');
+    const viewId = 'view-' + viewName;
+    document.querySelectorAll('.app-view').forEach(view => view.style.display = 'none');
 
-    // إذا تم فتح واجهة البحث، نقوم برمي البيانات المستخرجة من الـ CSV تلقائياً
+    const target = document.getElementById(viewId);
+    if (target) {
+        target.style.display = 'block';
+    } else {
+        console.error('لا توجد شاشة بالـ id: ' + viewId);
+    }
+
+    document.querySelectorAll('.nav-tab-item').forEach(tab => tab.classList.remove('active'));
+    const navTab = document.getElementById('tab-' + viewName);
+    if (navTab) navTab.classList.add('active');
+
     if (viewName === 'search') {
-        renderSearchResults(servicesData);
+        executeOfflineSearch();
     }
 }
 
-// 4. دالة عرض وتوليد عناصر قائمة البيانات الحقيقية من المصفوفة المستخرجة من الـ CSV
-function renderSearchResults(dataArray) {
-    const listContainer = document.getElementById('search-results-list');
-    const countBox = document.getElementById('results-count');
-    
-    listContainer.innerHTML = '';
-    countBox.innerText = dataArray.length;
+// ==================== 6. الدخول للبحث من الكروت المباشرة (قبل الدخول للتطبيق) ====================
+function filterService(cat) {
+    enterMainApp();
+    switchView('search');
+    setActiveFilterTab(normalizeCategory(cat) === 'maintenance' ? 'repair' : cat);
+}
 
-    if (dataArray.length === 0) {
-        listContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; margin-top:20px;">لا توجد خدمات تطابق بحثك حالياً.</p>';
+function filterServicesByCategory(cat) {
+    switchView('search');
+    setActiveFilterTab(cat);
+}
+
+function setActiveFilterTab(cat) {
+    activeSearchCategory = normalizeCategory(cat);
+    document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        if (tab.getAttribute('onclick') && tab.getAttribute('onclick').includes(`'${cat}'`)) {
+            tab.classList.add('active');
+        }
+    });
+    executeOfflineSearch();
+}
+
+function filterByTab(cat, btnElement) {
+    activeSearchCategory = normalizeCategory(cat);
+    document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    executeOfflineSearch();
+}
+
+function handleSearchFiltering() {
+    executeOfflineSearch();
+}
+
+// ==================== 7. محرك البحث والفلترة الأساسي ====================
+function executeOfflineSearch() {
+    const container = document.getElementById('search-results-list');
+    const inputField = document.getElementById('main-search-input');
+    const countLabel = document.getElementById('results-count');
+
+    if (!container) return;
+
+    const inputVal = inputField ? inputField.value.trim() : "";
+    let matches = [];
+
+    const categories = activeSearchCategory === 'all'
+        ? ['water', 'power', 'maintenance', 'aid']
+        : [normalizeCategory(activeSearchCategory)];
+
+    categories.forEach(cat => {
+        const dataList = window.SANAD_OFFLINE_DATABASE[cat] || [];
+        dataList.forEach(item => {
+            const regionStr = item.region || "";
+            const locationStr = item.location || "";
+            const typeStr = item.type || "";
+
+            const matchesText = regionStr.includes(inputVal) || locationStr.includes(inputVal) || typeStr.includes(inputVal);
+            if (!matchesText && inputVal !== "") return;
+
+            let catIcon = "💧";
+            let titleText = item.location;
+            let subInfoText = "";
+
+            if (cat === 'water') {
+                catIcon = "💧";
+                titleText = `نقطة مياه ${item.region}`;
+                subInfoText = `المتبقي: ${item.available ?? '--'} لتر من أصل ${item.capacity ?? '--'} لتر`;
+            } else if (cat === 'power') {
+                catIcon = "⚡";
+                titleText = item.location;
+                subInfoText = `المنافذ الشاغرة: ${item.available_ports ?? '--'} من أصل ${item.total_ports ?? '--'}`;
+            } else if (cat === 'maintenance') {
+                catIcon = "🔧";
+                titleText = `مركز صيانة ${item.region}`;
+                subInfoText = `طاقم العمل المتواجد: ${item.technicians ?? '--'} فنيين`;
+            } else if (cat === 'aid') {
+                catIcon = "📦";
+                titleText = item.location;
+                subInfoText = `النوع الموزع: ${item.type ?? '--'} | الجهة: ${item.distributor ?? '--'}`;
+            }
+
+            const cardHTML = `
+                <div class="service-card-item" style="width:100%; cursor:pointer;" onclick="openServiceDetails('${cat}', ${item.id})">
+                    <div class="service-icon-wrap">${catIcon}</div>
+                    <span style="display:block; font-weight:bold;">${titleText}</span>
+                    <span style="display:block; font-size:11px; color:#64748b; margin-top:4px;">📍 ${locationStr}</span>
+                    <span style="display:block; font-size:11px; color:#64748b;">${subInfoText}</span>
+                </div>
+            `;
+            matches.push(cardHTML);
+        });
+    });
+
+    if (countLabel) countLabel.innerText = matches.length;
+    container.innerHTML = matches.length
+        ? matches.join('')
+        : `<p style="text-align:center; padding:30px; color:#a0aec0;">لا توجد نتائج.</p>`;
+}
+
+// ==================== 8. عرض تفاصيل خدمة معينة ====================
+function openServiceDetails(category, id) {
+    const item = (window.SANAD_OFFLINE_DATABASE[category] || []).find(x => x.id === id);
+    if (!item) return;
+
+    currentlyOpenService = { category, id };
+
+    const iconsByCat = { water: '💧', power: '⚡', maintenance: '🔧', aid: '📦' };
+    const titleEl = document.getElementById('detail-name');
+    const typeEl = document.getElementById('detail-type');
+    const locationEl = document.getElementById('detail-location');
+    const hoursEl = document.getElementById('detail-hours');
+    const iconEl = document.getElementById('detail-large-icon');
+    const statusEl = document.getElementById('detail-status-badge');
+    const headerTitleEl = document.getElementById('detail-header-title');
+
+    if (titleEl) titleEl.innerText = item.location || item.type || 'تفاصيل الخدمة';
+    if (typeEl) typeEl.innerText = item.type || '';
+    if (locationEl) locationEl.innerText = `${item.location || ''}${item.region ? ' - ' + item.region : ''}`;
+    if (hoursEl) hoursEl.innerText = item.hours || 'غير محدد';
+    if (iconEl) iconEl.innerText = iconsByCat[category] || '📍';
+    if (statusEl) statusEl.innerText = item.status || 'متاح حالياً';
+    if (headerTitleEl) headerTitleEl.innerText = 'تفاصيل الخدمة';
+
+    switchView('details');
+}
+
+// ==================== 9. الملف الشخصي وإضافة خدمة جديدة ====================
+function handleAddNewService() {
+    const name = document.getElementById('new-service-name')?.value.trim();
+    const category = normalizeCategory(document.getElementById('new-service-category')?.value);
+    const location = document.getElementById('new-service-location')?.value.trim();
+    const hours = document.getElementById('new-service-hours')?.value.trim();
+
+    if (!name || !location || !hours) {
+        alert('الرجاء تعبئة جميع الحقول المطلوبة.');
         return;
     }
 
-    dataArray.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'result-card-figma';
-        card.onclick = () => showServiceDetails(item);
-        
-        card.innerHTML = `
-            <div class="result-main-info">
-                <div style="font-size:24px; background:#f8fafc; padding:10px; border-radius:12px;">${item.icon || '📍'}</div>
-                <div>
-                    <h4 style="margin:0 0 4px 0; color:#061527; font-weight:bold; font-size:14px;">${item.name}</h4>
-                    <p style="margin:0; font-size:11px; color:#64748b;">${item.region || 'غزة'}</p>
-                </div>
-            </div>
-            <span class="badge-status-open">متاح</span>
-        `;
-        listContainer.appendChild(card);
-    });
-}
+    if (!window.SANAD_OFFLINE_DATABASE[category]) window.SANAD_OFFLINE_DATABASE[category] = [];
 
-// 5. الفلترة السريعة عبر النقر على تصنيفات وأيقونات الصفحة الرئيسية
-function filterServicesByCategory(categoryName) {
-    switchView('search');
-    const filtered = servicesData.filter(item => item.category === categoryName);
-    renderSearchResults(filtered);
-}
+    const newId = window.SANAD_OFFLINE_DATABASE[category].length
+        ? Math.max(...window.SANAD_OFFLINE_DATABASE[category].map(x => x.id)) + 1
+        : 1;
 
-// 6. عرض شاشة التفاصيل الكاملة وتحديث نصوصها عند النقر على أي بطاقة خدمة
-function showServiceDetails(item) {
-    switchView('details');
-    document.getElementById('detail-name').innerText = item.name;
-    document.getElementById('detail-type').innerText = item.type || 'خدمة طوارئ معتمدة';
-    document.getElementById('detail-location').innerText = `${item.region} ${item.landmark ? '- ' + item.landmark : ''}`;
-    document.getElementById('detail-hours').innerText = item.workingHours || 'متاح على مدار الساعة';
-    document.getElementById('detail-large-icon').innerText = item.icon || '📍';
-}
-
-// 7. معالجة البحث النصي الحي الفوري (Real-time Search) في واجهة البحث
-function handleSearchFiltering() {
-    const query = document.getElementById('main-search-input').value.toLowerCase();
-    const filtered = servicesData.filter(item => 
-        item.name.toLowerCase().includes(query) || 
-        item.region.toLowerCase().includes(query)
-    );
-    renderSearchResults(filtered);
-}
-
-// 8. ميزة تمكين مزودي الخدمة من إضافة بيانات جديدة ديناميكياً إلى التطبيق
-function handleAddNewService() {
-    const name = document.getElementById('new-service-name').value;
-    const category = document.getElementById('new-service-category').value;
-    const location = document.getElementById('new-service-location').value;
-    const hours = document.getElementById('new-service-hours').value;
-
-    const newObj = {
-        id: servicesData.length + 1,
-        name: name,
-        category: category,
+    window.SANAD_OFFLINE_DATABASE[category].push({
+        id: newId,
         region: location,
-        workingHours: hours,
-        icon: category === 'water' ? '💧' : category === 'power' ? '⚡' : category === 'repair' ? '🔧' : '🤝'
-    };
+        location: name,
+        type: name,
+        status: 'متاح',
+        hours: hours
+    });
 
-    servicesData.unshift(newObj); // إضافتها في مقدمة المصفوفة لتعرض أولاً
-    alert('تمت إضافة خدمتك الجديدة إلى المنصة بنجاح وسيتم تصفحها فوراً!');
-    switchView('search');
-}
-// دالة تشغيل تضمن ظهور شاشات الترحيب والتعريف دائماً أثناء التطوير
-function initSplash() {
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) {
-            splash.style.display = 'none'; // إخفاء شاشة التحميل الداكنة بعد ثانية ونصف
-        }
-        
-        // جعل شاشات التعريف تظهر دائماً بدون شروط الـ LocalStorage
-        const onboarding = document.getElementById('onboarding-screen');
-        if (onboarding) {
-            onboarding.style.display = 'flex';
-        }
-    }, 1500); 
-}
-
-// تشغيل الدالة فوراً عند قراءة بنية الصفحة
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSplash);
-} else {
-    initSplash();
+    alert('تمت إضافة الخدمة بنجاح ✅');
+    switchView('profile');
 }
